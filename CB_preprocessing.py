@@ -30,13 +30,6 @@ for sub_id in subjects:
             channel_types = {ch: 'eeg' for ch in raw.ch_names if ch != 'ECG1'}
             channel_types['ECG1'] = 'ecg'
             raw.set_channel_types(channel_types)
-            
-            raw.interpolate_bads(reset_bads=True, mode='accurate')
-
-            raw.filter(l_freq=0.5, h_freq=40.0, fir_design='firwin')
-            raw.notch_filter(freqs=50.0, fir_design='firwin')
-
-            raw.set_eeg_reference('average', projection=True)
 
             raw_for_ica = raw.copy().filter(l_freq=1.0, h_freq=None)
             ica = ICA(max_iter='auto', n_components=0.99, method='picard', random_state=715)
@@ -50,8 +43,14 @@ for sub_id in subjects:
             ]
             ica.exclude = exclude_idx
             print(f"     ICLabel found {len(exclude_idx)} artifact components.")
+            
+            
+            raw.filter(l_freq=0.5, h_freq=40.0, fir_design='firwin')
+            raw.notch_filter(freqs=50.0, fir_design='firwin')
 
             ica.apply(raw)
+            
+            raw.set_eeg_reference('average', projection=True)
 
             save_path = os.path.join(preprocessed_path, subject, session, 'eeg')
             os.makedirs(save_path, exist_ok=True)
