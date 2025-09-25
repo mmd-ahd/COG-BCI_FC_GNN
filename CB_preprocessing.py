@@ -31,27 +31,29 @@ for sub_id in subjects:
             channel_types['ECG1'] = 'ecg'
             raw.set_channel_types(channel_types)
 
-            raw_for_ica = raw.copy().filter(l_freq=1.0, h_freq=None)
-            ica = ICA(max_iter='auto', n_components=0.99, method='picard', random_state=715)
-            ica.fit(raw_for_ica)
+            raw.filter(l_freq=1, h_freq=100.0, fir_design='firwin')
+            
+            raw.set_eeg_reference('average')
+            
+            ica = ICA(max_iter='auto', method='infomax', fit_params=dict(extended=True), n_components=20, random_state=715)
+            ica.fit(raw)
 
-            label_components(raw, ica, method='iclabel')
+            ic_labels = label_components(raw, ica, method='iclabel')
 
+            labels = ic_labels["labels"]
             exclude_idx = [
-                idx for idx, label in enumerate(ica.labels_)
-                if label not in ["brain", "other"]
+                idx for idx, label in enumerate(labels) if label not in ["brain", "other"]
             ]
             ica.exclude = exclude_idx
-            print(f"     ICLabel found {len(exclude_idx)} artifact components.")
+            print(f"     ICLabel found: {ica.labels_}")
+
+            ica.apply(raw, exclude=ica.exclude)            
             
-            
-            raw.filter(l_freq=0.5, h_freq=40.0, fir_design='firwin')
+            raw.filter(l_freq=None, h_freq=40.0, fir_design='firwin')
             raw.notch_filter(freqs=50.0, fir_design='firwin')
 
-            ica.apply(raw)
-            
             raw.set_eeg_reference('average', projection=True)
-
+            
             save_path = os.path.join(preprocessed_path, subject, session, 'eeg')
             os.makedirs(save_path, exist_ok=True)
             save_fname = f"{file_name_no_ext}_preprocessed.fif"
