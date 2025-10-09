@@ -3,7 +3,7 @@ import mne
 import mne_connectivity
 import numpy as np
 
-subjects = range(20, 30)
+subjects = range(1, 30)
 sessions = range(1, 4)
 
 epochs_base_path = "data/derivatives/epochs"
