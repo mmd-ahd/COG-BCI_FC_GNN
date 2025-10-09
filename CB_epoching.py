@@ -35,6 +35,8 @@ for sub_id in subjects:
 
             if os.path.exists(file_path):
                 raw = mne.io.read_raw_fif(file_path, preload=True, verbose=False)
+                
+                raw.resample(250)
 
                 events, _ = mne.events_from_annotations(raw, event_id=event_map, verbose=False)
 
