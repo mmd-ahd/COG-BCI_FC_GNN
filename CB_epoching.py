@@ -52,4 +52,3 @@ for sub_id in subjects:
                     full_save_path = os.path.join(save_dir, save_fname)
                     
                     epochs.save(full_save_path, overwrite=True)
-                    print(f"Created and saved {len(epochs)} epochs for {task_name} to {save_fname}")
