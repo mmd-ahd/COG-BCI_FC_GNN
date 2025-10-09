@@ -3,7 +3,7 @@ import mne
 import mne_connectivity
 import numpy as np
 
-subjects = range(1, 30)
+subjects = range(20, 30)
 sessions = range(1, 4)
 
 epochs_base_path = "data/derivatives/epochs"
@@ -11,8 +11,8 @@ connectivity_base_path = "data/derivatives/connectivity"
 os.makedirs(connectivity_base_path, exist_ok=True)
 
 tasks = ['twoBACK', 'Flanker', 'PVT']
-fmin = 4
-fmax = 45
+fmin = (4, 8, 13, 30)
+fmax = (8, 13, 30, 45)
 freqs = np.arange(4, 46)
 n_cycles = freqs * 3/4
 method = 'wpli'
@@ -43,6 +43,7 @@ for sub_id in subjects:
                 mode=mode,
                 fmin=fmin,
                 fmax=fmax,
+                faverage=True,
                 cwt_freqs=freqs,
                 cwt_n_cycles=n_cycles
             )
